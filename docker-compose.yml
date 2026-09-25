@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # 1. FastAPI REST Microservice (Backend)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apix_api
+    restart: unless-stopped
+    command: ["uvicorn", "apix.api.server:app", "--host", "0.0.0.0", "--port", "8000"]
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # 2. Streamlit Interactive Dashboard (Frontend)
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apix_dashboard
+    restart: unless-stopped
+    command: ["streamlit", "run", "apix/dashboard/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # 3. Nginx Reverse Proxy Gateway (Unified Port 80)
+  nginx:
+    image: nginx:alpine
+    container_name: apix_gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - dashboard
