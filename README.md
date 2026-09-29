@@ -1,6 +1,5 @@
 # APIx : Real-time Airfare Price Index for India
 **Augmentation of the Consumer Price Index (CPI Transport Sub-Group) via Automated Web Scraping**  
-*Smart India Hackathon 2026 | Team: CodeCrew*
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com)
